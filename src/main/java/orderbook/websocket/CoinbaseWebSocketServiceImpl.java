@@ -28,6 +28,12 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -40,20 +46,20 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
     @Autowired
     private OrderBook orderBook;
 
-    /**
-     * Send this object as soon as we connect to the Coinbase Market API
-     * to signify we want to subscribe to the BTC-USD feed.
-     */
+    String COINBASE_SUBSCRIBE_MESSAGE;
 
-    static String payload_old = "{\"type\":\"subscribe\", " +
-                    "\"channels\": [\"level2\",{ " +
-                    "\"name\":\"ticker\",\"product_ids\":[\"BTC-USD\"]}]} ";
-
-    static String payload = "{\"type\": \"subscribe\",\"channels\":[{\"name\": \"ticker\",\"product_ids\": [\"BTC-USD\"]}]}";
-
-
-
-    private static String COINBASE_SUBSCRIBE_MESSAGE = payload;
+    {
+        try {
+            URL jsonResource = getClass().getClassLoader().getResource("l2subscribe.json");
+            Path filePath = Paths.get(jsonResource.toURI());
+            COINBASE_SUBSCRIBE_MESSAGE = new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8);
+            LOG.info("JSON extracted: ",COINBASE_SUBSCRIBE_MESSAGE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     @PostConstruct
     public void init() throws Exception{
@@ -186,7 +192,7 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
         LOG.debug("got coinbase msg {}", msg);
         System.out.println("got coinbase msg: "+msg);
 
-        if(!msg.contains("error")){
+        if(!msg.contains("error") && !msg.contains("subscriptions")){
             orderBook.addOrder(OrderEventParser.parseOrderEvent(msg));
         }else{
             LOG.error("Failed to receive a valid Order message from Coinbase: ",msg);

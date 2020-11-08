@@ -7,13 +7,12 @@ import java.time.format.DateTimeFormatter;
 
 public class DateUtility {
 
-    public static final DateTimeFormatter orderTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter orderTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     public static final ZoneOffset ZONE_OFFSET = ZoneOffset.ofHours(8);
 
     public static LocalDateTime parseLocalDateTime(String localDateTimeString) {
         //2020-11-08T07:24:26.014269Z
-        String dateTimeString = localDateTimeString.split(".")[0];
-        LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, orderTimeFormat);
+        LocalDateTime dateTime = LocalDateTime.parse(localDateTimeString.replace("Z",""));
         return dateTime;
     }
 

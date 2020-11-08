@@ -37,7 +37,7 @@ public class OrderEventParser {
                 .tradeId(coinBaseOrderEvent.getTrade_id())
                 .lastSize(parseDouble(coinBaseOrderEvent.getLast_size()))
                 .build();
-        LOG.info("order parsed: ",order);
+        LOG.info("order parsed: "+order.toString());
         return order;
     }
 }

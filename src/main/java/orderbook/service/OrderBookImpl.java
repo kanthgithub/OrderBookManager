@@ -23,8 +23,12 @@ public class OrderBookImpl implements OrderBook {
     }
 
     @Override
-    public void addOrder(Order oe) {
-        LOG.info("got order to get Added: ",oe);
+    public void addOrder(Order order) {
+        LOG.info("got order to get Added: %s" , order);
+
+
+
+
 
 
     }

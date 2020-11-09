@@ -80,7 +80,6 @@ public class OrderBookImpl implements OrderBook {
 
     public void addOrderToAsks(Order order){
 
-
         if(asks.size() > 0){
 
             if(asks.peekFirst().getPrice() > order.getPrice()){

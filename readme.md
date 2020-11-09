@@ -202,7 +202,78 @@
 - For each new OrderEvent, lookup in Orderbook if it can replace the existing orders based on sorting by orderPrice
 - Sort the Orders in the OrderBook once it is appended.
 
-### Core sorting logic for OrderBook:
+## Add Order to OrderBook:
+
+ - As OrderBook has 2 groups Bid and Ask
+ - An incoming Buy-order will be added to Bid
+ 
+   ```java
+   
+    public void addOrderToBids(Order order){
+
+        if(bids.size() > 0){
+
+            if(bids.peekFirst().getPrice() < order.getPrice()){
+
+                if(bids.size() == 10) {
+                    Order order_Polled = bids.pollLast();
+                    LOG.info("KnockingOut Bid-Order: " + order_Polled);
+                }
+
+                LOG.info("Offering best Bid-Order: "+order);
+                bids.offerFirst(order);
+            } else {
+                if (bids.size() < 10) {
+                    LOG.info("filling Bid-Order: "+order);
+                    bids.offerLast(order);
+                }
+            }
+
+            Collections.sort(bids, OrderComparator.DescBidComparer());
+
+        }else{
+            LOG.info("Offering best Bid-Order: "+order);
+            bids.offerLast(order);
+        }
+
+    }
+
+   ```
+   
+ - An incoming Sell-order will be added to Ask
+ 
+   ```java
+    public void addOrderToAsks(Order order){
+
+        if(asks.size() > 0){
+
+            if(asks.peekFirst().getPrice() > order.getPrice()){
+
+                if(asks.size() == 10) {
+                    Order order_Polled = asks.pollLast();
+                    LOG.info("KnockingOut Ask-Order: " + order_Polled);
+                }
+
+                LOG.info("Offering best Ask-Order: "+order);
+                asks.offerFirst(order);
+            } else {
+                if (asks.size() < 10) {
+                    LOG.info("filling Ask-Order: "+order);
+                    asks.offerLast(order);
+                }
+            }
+
+            Collections.sort(asks, OrderComparator.DescAskComparer());
+
+        }else{
+            LOG.info("Offering best Ask-Order: "+order);
+            asks.offerLast(order);
+        }
+    }
+   ```  
+
+
+## Core sorting logic for OrderBook:
 
  - Orders in Bid/Ask are sorted based on OrderPrice.
  

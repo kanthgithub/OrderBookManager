@@ -11,8 +11,4 @@ public interface OrderBook {
     List<Order> getAsks();
 
     void addOrder(Order oe);
-
-    void modOrder(Order oe);
-
-    void delOrder(Order oe);
 }

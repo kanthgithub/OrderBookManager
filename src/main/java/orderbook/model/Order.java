@@ -26,7 +26,7 @@ public class Order {
     private Double openPrice;
     private Double bestBid;
     private Double bestAsk;
-    private long time;
+    private Long time;
 
     @Override
     public String toString() {

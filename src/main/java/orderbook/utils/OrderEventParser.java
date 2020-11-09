@@ -25,7 +25,6 @@ public class OrderEventParser {
             return  null;
         }
 
-        LOG.info("parsed coinBaseOrderEvent: ",coinBaseOrderEvent);
         Order order = Order.builder().price(parseDouble(coinBaseOrderEvent.getPrice()))
                 .openPrice(parseDouble(coinBaseOrderEvent.getOpen_24h()))
                 .bestBid(parseDouble(coinBaseOrderEvent.getBest_bid()))
@@ -37,7 +36,7 @@ public class OrderEventParser {
                 .tradeId(coinBaseOrderEvent.getTrade_id())
                 .lastSize(parseDouble(coinBaseOrderEvent.getLast_size()))
                 .build();
-        LOG.info("order parsed: "+order.toString());
+        LOG.debug("order parsed: "+order.toString());
         return order;
     }
 }

@@ -1,17 +1,8 @@
 package orderbook.websocket;
 
 import orderbook.service.OrderBook;
+import orderbook.service.OrderReportGenerator;
 import orderbook.utils.OrderEventParser;
-import org.apache.http.client.HttpClient;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -25,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,6 +35,9 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
 
     @Autowired
     private OrderBook orderBook;
+
+    @Autowired
+    private OrderReportGenerator orderReportGenerator;
 
     String COINBASE_SUBSCRIBE_MESSAGE;
 
@@ -70,34 +63,7 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
 
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,SSLv3");
 
-        SSLContext sslContext = SSLContext.getDefault();
-
-        SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(
-                sslContext,
-                new String[]{"TLSv1.2"}, // important
-                null,
-                NoopHostnameVerifier.INSTANCE);
-
-        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("https", sslConnectionFactory)
-                .register("http", PlainConnectionSocketFactory.INSTANCE)
-                .build();
-
-        HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
-        HttpClient httpclient = HttpClientBuilder.create().setSSLSocketFactory(sslConnectionFactory)
-                .setConnectionManager(ccm)
-                .build();
-
         String destUri = "wss://ws-feed.pro.coinbase.com";
-
-
-        //The websocket feed provides real-time market data updates for orders and trades.
-        //String destUri = "wss://ws-feed.gdax.com";
-
-        //To begin receiving feed messages,
-        // you must first send a subscribe message to the server indicating
-        // which channels and products to receive.
-        // This message is mandatory — you will be disconnected if no subscribe has been received within 5 seconds.
 
         WebSocketClient client = new WebSocketClient(new SslContextFactory());
         try {
@@ -165,23 +131,6 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
         }
     }
 
-//    var websocket = new Gdax.WebsocketClient(
-//            ['BTC-USD'],
-//    'wss://ws-feed.gdax.com',
-//    {
-//        key: API_KEY,
-//                secret: API_SECRET,
-//            passphrase: API_PASSPHRASE,
-//    },
-//    { heartbeat: true }
-//)
-//        webSocket.on('message', data => {
-//        console.log(data);
-//    });
-
-
-
-
     /**
      * Here we recive a Coinbase message and push it onto our queue.
      * @param msg The coinbase market data feed
@@ -189,11 +138,12 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
      */
     @OnWebSocketMessage
     public void onMessage(String msg) {
-        LOG.debug("got coinbase msg {}", msg);
-        System.out.println("got coinbase msg: "+msg);
-
         if(!msg.contains("error") && !msg.contains("subscriptions")){
             orderBook.addOrder(OrderEventParser.parseOrderEvent(msg));
+            String orderBookReport = orderReportGenerator.generateOrderBookReport();
+            LOG.info("\n -------------------------------------------------------\n");
+            LOG.info("\n\n OrderBookReport: \n\n"+orderBookReport);
+            LOG.info("\n -------------------------------------------------------\n");
         }else{
             LOG.error("Failed to receive a valid Order message from Coinbase: ",msg);
         }

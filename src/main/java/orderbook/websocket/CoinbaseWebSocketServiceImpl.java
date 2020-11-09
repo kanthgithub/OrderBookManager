@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,8 +53,15 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
         }
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void init() throws Exception{
+        initWebSocketCommunication();
+    }
+
+    public void startOrderBook(String ticker) throws Exception {
+        LOG.info("starting Building Order-Book for Ticker: "+ticker);
+        COINBASE_SUBSCRIBE_MESSAGE = COINBASE_SUBSCRIBE_MESSAGE.replace("tickerReplaceableByCommandLineArgument",ticker);
+        LOG.info("COINBASE_SUBSCRIBE_MESSAGE after commandline: "+COINBASE_SUBSCRIBE_MESSAGE);
         initWebSocketCommunication();
     }
 

@@ -53,11 +53,6 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
         }
     }
 
-    //@PostConstruct
-    public void init() throws Exception{
-        initWebSocketCommunication();
-    }
-
     public void startOrderBook(String ticker) throws Exception {
         LOG.info("starting Building Order-Book for Ticker: "+ticker);
         COINBASE_SUBSCRIBE_MESSAGE = COINBASE_SUBSCRIBE_MESSAGE.replace("tickerReplaceableByCommandLineArgument",ticker);

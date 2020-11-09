@@ -1,6 +1,3 @@
-https://github.com/irufus/gdax-java/blob/master/websocketfeed/src/main/java/com/coinbase/exchange/websocketfeed/OpenedOrderBookMessage.java
-
-
  A valid order has been received and is now active. This message is
  * emitted for every single valid order as soon as the matching engine
  * receives it whether it fills immediately or not.

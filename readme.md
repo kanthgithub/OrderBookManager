@@ -187,3 +187,69 @@
 			
 				
 ```
+
+
+## OrderBook Builder:
+
+- Order Book is updated for every new tickerEvent
+- OrderBook contains orders segregated by Bid And Ask
+  - A Bid Order is the one with side: Buy
+  - An Ask Order is the one with side: Sell
+- Best bid Order is the one which has highest Price (Bid Price)
+- Best Ask Order is the one which has lowest Price (Ask Price)
+
+- Order Book is of L10, i.e at any time order book contains 10 Bids and 10 Asks
+- For each new OrderEvent, lookup in Orderbook if it can replace the existing orders based on sorting by orderPrice
+- Sort the Orders in the OrderBook once it is appended.
+
+### Core sorting logic for OrderBook:
+
+ - Orders in Bid/Ask are sorted based on OrderPrice.
+ 
+ - I have implemented a Comparator which sorts the Orders in OrderBook based on the direction of the OrderSide: Bid/Ask or Buy/Sell
+ 
+ ```java
+ public class OrderComparator implements Comparator<Order> {
+
+    //-1 for Bid comparer
+    //1 for Ask comparer
+    private int _priceComparisonCoeff;
+
+    OrderComparator(int priceComparisonCoeff)
+    {
+        _priceComparisonCoeff = priceComparisonCoeff;
+    }
+
+    @Override
+    public int compare(Order x, Order y) {
+
+        //two limit orders
+        if (x.getPrice()!= y.getPrice())
+        {
+            return _priceComparisonCoeff * x.getPrice().compareTo(y.getPrice());
+        }
+
+        if (x.getTime() != y.getTime())
+        {
+            return x.getTime().compareTo(y.getTime());
+        }
+
+
+        //they have the same characteristics. not necessary same ID
+        //not good because we are not supposed to have two equivalent orders in the orderbook
+        return 0;
+    }
+
+
+    public static OrderComparator DescBidComparer()
+    {
+        return new OrderComparator(-1);
+    }
+
+    public static OrderComparator DescAskComparer()
+    {
+        return new OrderComparator(1);
+    }
+}
+ 
+ ```

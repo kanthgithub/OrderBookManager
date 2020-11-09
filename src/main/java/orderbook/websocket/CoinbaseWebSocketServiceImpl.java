@@ -132,7 +132,7 @@ public class CoinbaseWebSocketServiceImpl implements CoinbaseWebSocketService{
     }
 
     /**
-     * Here we recive a Coinbase message and push it onto our queue.
+     * Here we receive a Coinbase message and push it onto our orderBook.
      * @param msg The coinbase market data feed
      *     https://docs.exchange.coinbase.com/#websocket-feed
      */

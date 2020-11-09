@@ -6,17 +6,12 @@
 3. Maven project
 4. Spring-Boot for Dependency Injection and Application Run
 
-## get Order Data from L2 Data of Coinbase:
-
-
-
 
 ## Pre-Requisites to build and run the application:
 
 ### Maven based package and start:
 
 1.  Essentials:  maven 3.3.9 + and jdk-8, jre-8
-
 
 
 ## How to Run application from command-line:
@@ -32,10 +27,11 @@
 ## How to Run application from IntelliJ:
 
 
+
+## get Order Data from L2 Data of Coinbase:
+
  
- 
- 
-## OrderBook Command execution Flow: 
+### OrderBook Command execution Flow: 
  
 - If you have issues to run command on console, make sure you have set
   Maven and Java Home in your environment variables
